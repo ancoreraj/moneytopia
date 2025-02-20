@@ -195,6 +195,9 @@ fun AddExpensePage(
                                 )
                             }
                             controller?.hide()
+
+                            // Navigate back to the last page after saving
+                            navController.popBackStack()
                         },
                         enabled = state.amount != "" && state.category != "" && state.note != ""
                     ) {
