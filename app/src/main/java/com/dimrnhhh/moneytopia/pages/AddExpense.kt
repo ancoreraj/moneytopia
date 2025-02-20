@@ -199,7 +199,7 @@ fun AddExpensePage(
                             // Navigate back to the last page after saving
                             navController.popBackStack()
                         },
-                        enabled = state.amount != "" && state.category != "" && state.note != ""
+                        enabled = state.amount != "" && state.category != ""
                     ) {
                         Text(text = stringResource(R.string.save_button))
                     }
