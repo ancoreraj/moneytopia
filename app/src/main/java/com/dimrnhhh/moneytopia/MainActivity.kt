@@ -90,12 +90,6 @@ class MainActivity : ComponentActivity() {
                         unselectedIcon = Icons.Outlined.Analytics,
                         route = "analytics"
                     ),
-                    BottomNavItem(
-                        title = stringResource(R.string.settings_title),
-                        selectedIcon = Icons.Filled.Settings,
-                        unselectedIcon = Icons.Outlined.Settings,
-                        route = "settings"
-                    ),
                 )
                 val navController = rememberNavController()
                 val backStackEntry by navController.currentBackStackEntryAsState()
