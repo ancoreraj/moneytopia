@@ -97,43 +97,45 @@ fun ExpensesPage(
             }
         }
     ) { contentPadding ->
+        Log.d("contentPadding",contentPadding.toString())
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(contentPadding)
+                .padding(top = 140.dp)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(135.dp)
-                    .clip(MaterialTheme.shapes.large)
-                    .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.total_expenses),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Text(
-                    text = stringResource(R.string.currency) + DecimalFormat(stringResource(R.string.number_format)).format(state.sumTotal),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Button(onClick = {
-                    checkPermissionAndReadSms(context, permissionLauncher)
-                }) {
-                    Text("SMS Ingest")
-                }
-            }
-            Column(
-                modifier = Modifier
                     .verticalScroll(rememberScrollState())
             ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(95.dp)
+                        .padding(bottom = 10.dp)
+                        .clip(MaterialTheme.shapes.large)
+                        .background(MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.total_expenses),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        text = stringResource(R.string.currency) + DecimalFormat(stringResource(R.string.number_format)).format(state.sumTotal),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+//                Button(onClick = {
+//                    checkPermissionAndReadSms(context, permissionLauncher)
+//                }) {
+//                    Text("SMS Ingest")
+//                }
+                }
                 ExpensesByDay(
                     expenses = state.expenses,
                     navController = navController

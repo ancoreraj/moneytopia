@@ -1,5 +1,6 @@
 package com.dimrnhhh.moneytopia.pages
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -79,10 +80,11 @@ fun AnalyticsPage(
             }
         }
     ) { contentPadding ->
+        Log.d("contentPadding",contentPadding.toString())
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(contentPadding),
+                .padding(top = 140.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {

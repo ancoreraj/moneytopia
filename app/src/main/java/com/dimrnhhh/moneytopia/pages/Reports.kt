@@ -1,5 +1,6 @@
 package com.dimrnhhh.moneytopia.pages
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -64,11 +65,12 @@ fun ReportsPage(
             }
         }
     ) { contentPadding ->
+        Log.d("contentPadding",contentPadding.toString())
         viewModel.setRecurrence(Recurrence.Yearly)
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(contentPadding)
+                .padding(top = 140.dp)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
