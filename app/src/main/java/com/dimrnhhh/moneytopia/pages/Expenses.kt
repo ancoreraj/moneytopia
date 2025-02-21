@@ -139,7 +139,7 @@ fun ExpensesPage(
                     navController = navController
                 )
 
-                Spacer(modifier = Modifier.height(88.dp))
+                Spacer(modifier = Modifier.height(160.dp))
             }
         }
     }

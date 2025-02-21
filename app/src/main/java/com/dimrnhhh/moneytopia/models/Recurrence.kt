@@ -6,6 +6,7 @@ sealed class Recurrence(val name: String, val target: String) {
     data object Weekly: Recurrence("Weekly", "Weekly")
     data object Monthly: Recurrence("Monthly", "Monthly")
     data object Yearly: Recurrence("Yearly", "Yearly")
+    data object HomeExpensePage : Recurrence("HomeExpensePage", "HomeExpensePage")
 }
 
 fun String.toRecurrence(): Recurrence {
@@ -15,6 +16,7 @@ fun String.toRecurrence(): Recurrence {
         "Weekly" -> Recurrence.Weekly
         "Monthly" -> Recurrence.Monthly
         "Yearly" -> Recurrence.Yearly
+        "HomeExpensePage" -> Recurrence.HomeExpensePage
         else -> Recurrence.None
     }
 }

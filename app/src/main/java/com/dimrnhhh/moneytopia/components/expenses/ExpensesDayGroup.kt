@@ -63,14 +63,14 @@ fun ExpensesDayGroup(
                     Text(
                         text = "Total",
                         fontWeight = FontWeight.SemiBold,
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 },
                 trailingContent = {
                     Text(
                         text = stringResource(R.string.total_currency) + DecimalFormat(stringResource(R.string.number_format)).format(dayExpenses.total),
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
