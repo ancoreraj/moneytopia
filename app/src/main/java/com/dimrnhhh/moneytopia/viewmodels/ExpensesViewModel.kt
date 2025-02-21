@@ -17,7 +17,8 @@ import kotlinx.coroutines.launch
 data class ExpensesState(
     val recurrence: Recurrence = Recurrence.Daily,
     val expenses: List<Expense> = listOf(),
-    val sumTotal: Double = 0.0
+    val sumTotal: Double = 0.0,
+    val sumTotalToday: Double = 0.0
 )
 
 class ExpensesViewModel: ViewModel() {
@@ -64,7 +65,7 @@ class ExpensesViewModel: ViewModel() {
     }
 
     private fun setHomeExpensePageRecurrence() {
-        val (start, end) = calculateDateRange(Recurrence.Weekly, 0)
+        val (start, end) = calculateDateRange(Recurrence.Monthly, 0)
         val today = java.time.LocalDate.now()
 
         val filteredExpenses = realm.query<Expense>().find().filter {
@@ -79,12 +80,14 @@ class ExpensesViewModel: ViewModel() {
         }
 
         val sumTotalToday = todayExpenses.sumOf { it.amount }
+        val sumTotal = filteredExpenses.sumOf { it.amount }
 
         _uiState.update {
             it.copy(
                 recurrence = Recurrence.Weekly,
-                expenses = filteredExpenses, // Keeping all expenses for the week
-                sumTotal = sumTotalToday // Only today's total
+                expenses = filteredExpenses,
+                sumTotal = sumTotal ,
+                sumTotalToday = sumTotalToday
             )
         }
     }

@@ -84,7 +84,8 @@ fun AnalyticsPage(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 140.dp),
+                .padding(top = 140.dp)
+                .padding(bottom = 25.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {

@@ -71,6 +71,7 @@ fun ReportsPage(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = 140.dp)
+                .padding(bottom = 25.dp)
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(10.dp)

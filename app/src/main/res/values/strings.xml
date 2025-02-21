@@ -37,7 +37,8 @@
     //**Expenses Page**//
     <string name="recent_transactions">Recent Transactions</string>
     <string name="see_all">See All</string>
-    <string name="total_expenses">Total Expenses Today</string>
+    <string name="total_expenses">Total Expenses</string>
+    <string name="total_expenses_today" translatable="false">Total Expenses Today</string>
     <string name="currency">$</string>
     <string name="total_currency">- $</string>
     <string name="number_format">#,###.##</string>

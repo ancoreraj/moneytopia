@@ -121,11 +121,11 @@ fun ExpensesPage(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = stringResource(R.string.total_expenses),
+                        text = stringResource(R.string.total_expenses_today),
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
-                        text = stringResource(R.string.currency) + DecimalFormat(stringResource(R.string.number_format)).format(state.sumTotal),
+                        text = stringResource(R.string.currency) + DecimalFormat(stringResource(R.string.number_format)).format(state.sumTotalToday),
                         style = MaterialTheme.typography.titleMedium,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.SemiBold
