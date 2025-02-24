@@ -1,6 +1,7 @@
 package com.dimrnhhh.moneytopia
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -49,6 +50,7 @@ import com.dimrnhhh.moneytopia.pages.AddExpensePage
 import com.dimrnhhh.moneytopia.pages.AnalyticsPage
 import com.dimrnhhh.moneytopia.pages.ExpensesPage
 import com.dimrnhhh.moneytopia.pages.LanguagesPage
+import com.dimrnhhh.moneytopia.pages.OnboardingScreen
 import com.dimrnhhh.moneytopia.pages.ReportsPage
 import com.dimrnhhh.moneytopia.pages.SettingsPage
 import com.dimrnhhh.moneytopia.ui.theme.MoneytopiaTheme
@@ -66,6 +68,11 @@ class MainActivity : ComponentActivity() {
         }
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        // SharedPreferences to check if onboarding should be shown
+        val sharedPreferences = getSharedPreferences("moneytopia_prefs", Context.MODE_PRIVATE)
+        val isFirstTime = sharedPreferences.getBoolean("isFirstTime", true)
+
         setContent {
             MoneytopiaTheme {
                 var selectedItemIndex by rememberSaveable {
@@ -95,36 +102,43 @@ class MainActivity : ComponentActivity() {
                 val backStackEntry by navController.currentBackStackEntryAsState()
                 val bottomBarState = rememberSaveable { (mutableStateOf(true)) }
                 val fabState = rememberSaveable { mutableStateOf(true) }
-                when(backStackEntry?.destination?.route) {
-                    "expenses" -> {
-                        bottomBarState.value = true
-                        fabState.value = true
-                    }
-                    "expenses/add_expenses" -> {
-                        bottomBarState.value = false
-                        fabState.value = false
-                    }
-                    "reports" -> {
-                        bottomBarState.value = true
-                        fabState.value = false
-                    }
-                    "analytics" -> {
-                        bottomBarState.value = true
-                        fabState.value = false
-                    }
-                    "settings" -> {
-                        bottomBarState.value = true
-                        fabState.value = false
-                    }
-                    "settings/languages" -> {
-                        bottomBarState.value = false
-                        fabState.value = false
-                    }
-                    "settings/about" -> {
-                        bottomBarState.value = false
-                        fabState.value = false
+
+                if (isFirstTime) {
+                    bottomBarState.value = false
+                    fabState.value = false
+                } else {
+                    when(backStackEntry?.destination?.route) {
+                        "expenses" -> {
+                            bottomBarState.value = true
+                            fabState.value = true
+                        }
+                        "expenses/add_expenses" -> {
+                            bottomBarState.value = false
+                            fabState.value = false
+                        }
+                        "reports" -> {
+                            bottomBarState.value = true
+                            fabState.value = false
+                        }
+                        "analytics" -> {
+                            bottomBarState.value = true
+                            fabState.value = false
+                        }
+                        "settings" -> {
+                            bottomBarState.value = true
+                            fabState.value = false
+                        }
+                        "settings/languages" -> {
+                            bottomBarState.value = false
+                            fabState.value = false
+                        }
+                        "settings/about" -> {
+                            bottomBarState.value = false
+                            fabState.value = false
+                        }
                     }
                 }
+
                 Scaffold(
                     floatingActionButton = {
                         AnimatedVisibility(
@@ -187,7 +201,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(
                         navController = navController,
-                        startDestination = "expenses",
+                        startDestination = if (isFirstTime) "onboarding" else "expenses",
                         enterTransition = {
                             if(initialState.destination.route == backStackEntry?.destination?.route) {
                                 fadeIn(animationSpec = tween(durationMillis = 1))
@@ -203,6 +217,9 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     ) {
+                        composable("onboarding") {
+                            OnboardingScreen(navController)
+                        }
                         composable("expenses") {
                             ExpensesPage(navController)
                         }
