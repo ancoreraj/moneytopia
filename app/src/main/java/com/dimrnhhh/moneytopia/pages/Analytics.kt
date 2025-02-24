@@ -31,9 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.navigation.NavController
 import com.dimrnhhh.moneytopia.R
 import com.dimrnhhh.moneytopia.components.charts.Charts
+import com.dimrnhhh.moneytopia.components.charts.HorizontalPagerIndicator
 import com.dimrnhhh.moneytopia.components.header.AlertDialogInfo
 import com.dimrnhhh.moneytopia.components.header.HeaderPage
 import com.dimrnhhh.moneytopia.models.Recurrence
@@ -69,7 +71,7 @@ fun AnalyticsPage(
                     title = stringResource(R.string.analytics_title),
                     onClick = { openAlertDialog.value = true }
                 )
-                if(openAlertDialog.value) {
+                if (openAlertDialog.value) {
                     AlertDialogInfo(
                         onDismissRequest = { openAlertDialog.value = false },
                         onConfirmation = { openAlertDialog.value = false },
@@ -80,7 +82,7 @@ fun AnalyticsPage(
             }
         }
     ) { contentPadding ->
-        Log.d("contentPadding",contentPadding.toString())
+        Log.d("contentPadding", contentPadding.toString())
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -95,7 +97,7 @@ fun AnalyticsPage(
                         selected = selectedOpt == index,
                         onClick = {
                             selectedOpt = index
-                            when(index) {
+                            when (index) {
                                 0 -> viewModel.setRecurrence(Recurrence.Weekly)
                                 1 -> viewModel.setRecurrence(Recurrence.Monthly)
                                 2 -> viewModel.setRecurrence(Recurrence.Yearly)
@@ -120,6 +122,11 @@ fun AnalyticsPage(
             val pagerState = rememberPagerState(
                 pageCount = { numOfPages }
             )
+
+            HorizontalPagerIndicator(
+                pagerState = pagerState,
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
             HorizontalPager(
                 state = pagerState,
                 reverseLayout = true
@@ -131,11 +138,11 @@ fun AnalyticsPage(
                 )
             }
         }
-        BackHandler {
-            navController.navigate("expenses") {
-                popUpTo("expenses") {
-                    inclusive = true
-                }
+    }
+    BackHandler {
+        navController.navigate("expenses") {
+            popUpTo("expenses") {
+                inclusive = true
             }
         }
     }
