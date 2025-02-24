@@ -39,8 +39,8 @@
     <string name="see_all">See All</string>
     <string name="total_expenses">Total Expenses</string>
     <string name="total_expenses_today" translatable="false">Total Expenses Today</string>
-    <string name="currency">$</string>
-    <string name="total_currency">- $</string>
+    <string name="currency">Rs. </string>
+    <string name="total_currency">Rs. </string>
     <string name="number_format">#,###.##</string>
     <string name="empty_expenses">
         Transaction records are not yet available, please

@@ -12,6 +12,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,7 +49,7 @@ fun ExpensesDayGroup(
                     .clip(MaterialTheme.shapes.large)
                     .border(
                         width = 1.dp,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = MaterialTheme.colorScheme.surfaceColorAtElevation(50.dp),
                         shape = MaterialTheme.shapes.large
                     )
                     .clickable { /*TODO*/ },
@@ -56,7 +57,7 @@ fun ExpensesDayGroup(
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ReceiptLong,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 },
                 headlineContent = {
@@ -64,7 +65,7 @@ fun ExpensesDayGroup(
                         text = "Total",
                         fontWeight = FontWeight.SemiBold,
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                        color = MaterialTheme.colorScheme.primary
                     )
                 },
                 trailingContent = {
@@ -72,10 +73,10 @@ fun ExpensesDayGroup(
                         text = stringResource(R.string.total_currency) + DecimalFormat(stringResource(R.string.number_format)).format(dayExpenses.total),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                        color = MaterialTheme.colorScheme.primary
                     )
                 },
-                colors = ListItemDefaults.colors(MaterialTheme.colorScheme.primaryContainer)
+                colors = ListItemDefaults.colors(MaterialTheme.colorScheme.surfaceColorAtElevation(50.dp))
             )
         }
     }
