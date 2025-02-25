@@ -17,6 +17,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import android.Manifest
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import com.dimrnhhh.moneytopia.components.charts.HorizontalPagerIndicator
 
 @Composable
 fun OnboardingScreen(navController: NavController) {
@@ -48,41 +49,48 @@ fun OnboardingScreen(navController: NavController) {
             state = pagerState,
             modifier = Modifier.weight(1f)
         ) { page ->
-            Text(text = pages[page], style = MaterialTheme.typography.headlineMedium)
-        }
+            Text(
+                text = pages[page],
+                style = MaterialTheme.typography.headlineMedium
+            )
 
-        Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
             if (pagerState.currentPage == pages.size - 1) {
-                // Show SMS Permission Button Only If Not Granted
-                if (!hasSmsPermission) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    // Show SMS Permission Button Only If Not Granted
+                    if (!hasSmsPermission) {
+                        Button(onClick = {
+                            requestPermissionLauncher.launch(Manifest.permission.READ_SMS)
+                        }) {
+                            Text("Grant SMS Permission")
+                        }
+                    }
                     Button(onClick = {
-                        requestPermissionLauncher.launch(Manifest.permission.READ_SMS)
+                        sharedPreferences.edit().putBoolean("isFirstTime", false).apply()
+
+                        // Force recomposition by using rememberSaveable
+                        (context as? ComponentActivity)?.let { activity ->
+                            activity.recreate() // Restart activity to apply changes immediately
+                        }
+
+                        navController.navigate("expenses") {
+                            popUpTo("onboarding") { inclusive = true }
+                        }
                     }) {
-                        Text("Grant SMS Permission")
+                        Text("Get Started")
                     }
+
                 }
-
-
-                Button(onClick = {
-                    sharedPreferences.edit().putBoolean("isFirstTime", false).apply()
-
-                    // Force recomposition by using rememberSaveable
-                    (context as? ComponentActivity)?.let { activity ->
-                        activity.recreate() // Restart activity to apply changes immediately
-                    }
-
-                    navController.navigate("expenses") {
-                        popUpTo("onboarding") { inclusive = true }
-                    }
-                }) {
-                    Text("Get Started")
-                }
-
             }
         }
+
+        HorizontalPagerIndicator(
+            pagerState = pagerState,
+            modifier = Modifier.padding(bottom = 32.dp),
+            isInReverseOrder = false
+        )
     }
 }
 
