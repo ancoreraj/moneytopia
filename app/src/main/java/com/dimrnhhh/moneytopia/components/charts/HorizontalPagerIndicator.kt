@@ -21,7 +21,8 @@ fun HorizontalPagerIndicator(
     inactiveColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
     indicatorWidth: Int = 8,
     spacing: Int = 8,
-    indicatorCount: Int = 5
+    indicatorCount: Int = 5,
+    isInReverseOrder: Boolean
 ) {
     val totalDots = pagerState.pageCount
     val currentPage = pagerState.currentPage
@@ -43,9 +44,14 @@ fun HorizontalPagerIndicator(
             else -> (currentPage - windowSize / 2).coerceAtLeast(0)
         }
 
-        // Display dots in reverse order (right to left)
-        for (i in (windowOffset + windowSize - 1) downTo windowOffset) {
-            if (i in 0 until totalDots) {  // Ensure we don't exceed bounds
+        val range = if (isInReverseOrder) {
+            (windowOffset + windowSize - 1) downTo windowOffset
+        } else {
+            windowOffset until (windowOffset + windowSize)
+        }
+
+        for (i in range) {
+            if (i in 0 until totalDots) {
                 Box(
                     modifier = Modifier
                         .size(indicatorWidth.dp)
