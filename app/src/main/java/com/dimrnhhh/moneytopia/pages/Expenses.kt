@@ -36,19 +36,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.dimrnhhh.moneytopia.R
 import com.dimrnhhh.moneytopia.components.expenses.ExpensesByDay
 import com.dimrnhhh.moneytopia.components.header.AlertDialogInfo
 import com.dimrnhhh.moneytopia.components.header.HeaderPage
-import com.dimrnhhh.moneytopia.models.SmsData
 import com.dimrnhhh.moneytopia.viewmodels.ExpensesViewModel
 import java.text.DecimalFormat
 
@@ -56,17 +53,6 @@ import java.text.DecimalFormat
 fun ExpensesPage(
     navController: NavHostController,
     viewModel: ExpensesViewModel = viewModel(),
-    context: Context = LocalContext.current,
-    permissionLauncher: ActivityResultLauncher<String> = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if(isGranted) {
-            readSMS(context)
-        } else {
-            Toast.makeText(context, "SMS Permission denied", Toast.LENGTH_LONG).show()
-        }
-
-    }
 ) {
     val state by viewModel.uiState.collectAsState()
     Scaffold(
@@ -128,11 +114,6 @@ fun ExpensesPage(
                         fontSize = 32.sp,
                         fontWeight = FontWeight.SemiBold
                     )
-//                Button(onClick = {
-//                    checkPermissionAndReadSms(context, permissionLauncher)
-//                }) {
-//                    Text("SMS Ingest")
-//                }
                 }
                 ExpensesByDay(
                     expenses = state.expenses,
@@ -142,52 +123,5 @@ fun ExpensesPage(
                 Spacer(modifier = Modifier.height(160.dp))
             }
         }
-    }
-}
-
-fun checkPermissionAndReadSms(
-    context: Context,
-    permissionLauncher: ActivityResultLauncher<String>
-) {
-    if(ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.READ_SMS
-    ) != PackageManager.PERMISSION_GRANTED
-    ){
-        permissionLauncher.launch(Manifest.permission.READ_SMS)
-    }
-}
-
-fun readSMS(context: Context) {
-    val contentResolver: ContentResolver = context.contentResolver
-    val cursor = contentResolver.query(
-        Telephony.Sms.CONTENT_URI,
-        null,
-        null,
-        null,
-        null
-    )
-
-    val smsList = mutableListOf<SmsData>()
-    if(cursor != null && cursor.moveToFirst()) {
-        do {
-            val id = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms._ID))
-            val address = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.ADDRESS))
-            val body = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.BODY))
-            val date = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.DATE))
-            val dateSent = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.DATE_SENT))
-
-            smsList.add(
-                SmsData(
-                id = id,
-                address = address,
-                body = body,
-                date = date,
-                dateSent = dateSent
-            )
-            )
-        } while (cursor.moveToNext())
-
-        Log.d("Ankur", smsList.toString())
     }
 }

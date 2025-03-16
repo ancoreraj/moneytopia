@@ -8,6 +8,8 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.time.Instant
+import java.time.ZoneId
 
 @Composable
 fun LocalDate.formatDay(): String{
@@ -84,3 +86,14 @@ fun calculateDateRange(recurrence: Recurrence, page: Int): DateRangeData {
     )
 }
 
+fun epochToLocalDateTime(epochString: String): LocalDateTime? {
+    return try {
+        val epoch = epochString.toLong()
+        val instant = Instant.ofEpochMilli(epoch)
+        val zoneId = ZoneId.systemDefault() // Use system default time zone
+        val localDate = instant.atZone(zoneId).toLocalDateTime()
+        localDate
+    } catch (e: NumberFormatException) {
+        null
+    }
+}
