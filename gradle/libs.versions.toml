@@ -18,6 +18,7 @@ composeMaterial3DatetimePickers = "0.7.2"
 lifecycleViewmodelCompose = "2.8.7"
 appcompat = "1.7.0"
 vicoCompose = "1.16.0"
+kotlinxSerializationJson = "1.6.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -45,6 +46,7 @@ androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "a
 patrykandpatrick-vico-core = { module = "com.patrykandpatrick.vico:core", version.ref = "vicoCompose" }
 patrykandpatrick-vico-compose = { module = "com.patrykandpatrick.vico:compose", version.ref = "vicoCompose" }
 patrykandpatrick-vico-compose-m3 = { module = "com.patrykandpatrick.vico:compose-m3", version.ref = "vicoCompose" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
