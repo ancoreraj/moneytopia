@@ -14,13 +14,12 @@ import kotlin.random.Random
 fun createNotificationChannel(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val notificationManager = context.getSystemService(NotificationManager::class.java)
-//            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId = "daily_notification_channel"
 
         if (notificationManager.getNotificationChannel(channelId) != null) return
 
-        val channelName = "Coupons Expiry Reminder Notifications"
-        val description = "Channel to notify expiring coupons"
+        val channelName = "Daily Expense Tracker"
+        val description = "Channel to notify daily expenses"
         val importance = NotificationManager.IMPORTANCE_DEFAULT
         val channel = NotificationChannel(channelId, channelName, importance).apply {
             this.description = description
@@ -32,7 +31,7 @@ fun createNotificationChannel(context: Context) {
 // Function to schedule the daily notification
 fun scheduleDailyNotification(context: Context) {
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-    val (hours, minutes) = generateRandomTimeBetween9PMAnd1030PM()
+    val (hours, minutes) = Pair(22, 0)
     scheduleNotification(
         context = context,
         alarmManager = alarmManager,
@@ -57,7 +56,6 @@ fun scheduleNotification(
         putExtra("requestCode", requestCode)
     }
 
-    println("620555 NotificationUtils Scheduling for $hours:$minutes,$requestCode")
     val pendingIntent = PendingIntent.getBroadcast(
         /* context = */ context,
         /* requestCode = */ requestCode,

@@ -6,12 +6,21 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.dimrnhhh.moneytopia.MainActivity
 import com.dimrnhhh.moneytopia.R
+import com.dimrnhhh.moneytopia.database.realm
+import com.dimrnhhh.moneytopia.models.Expense
+import com.dimrnhhh.moneytopia.models.Recurrence
+import com.dimrnhhh.moneytopia.utils.calculateDateRange
+import io.realm.kotlin.ext.query
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
+import java.util.Locale
 
 class NotificationReceiver : BroadcastReceiver() {
 
@@ -22,19 +31,27 @@ class NotificationReceiver : BroadcastReceiver() {
         val permissionManager = PermissionManager(context)
 
         if (permissionManager.hasNotificationPermission()) {
-
-        } else {
-            Toast.makeText(context, "Notification Permission Denied", Toast.LENGTH_SHORT).show()
+            CoroutineScope(Dispatchers.Main).launch {
+                val sumOfExpenses = getSumOfExpenses(Recurrence.Daily)
+                showNotification(
+                    context = context,
+                    displayText = "Your expenses in the last 24 hours is ₹ $sumOfExpenses",
+                    notificationId = requestCode,
+                    requestCode = requestCode
+                )
+                rescheduleForNextDay(context, intent)
+            }
         }
+
+
     }
 
     @SuppressLint("MissingPermission")
     private fun showNotification(
         context: Context,
-        expiryPrompt: String,
+        displayText: String,
         notificationId: Int,
         requestCode: Int,
-        couponId: String?
     ) {
         val channelId = "daily_notification_channel"
 
@@ -44,8 +61,8 @@ class NotificationReceiver : BroadcastReceiver() {
             putExtra(
                 "notificationIntentData",
                 NotificationIntentData(
-                    context = "REMINDER_NOTIFICATION",
-                    contextId = couponId
+                    context = "24_HOURS_EXPENSE_NOTIFICATION",
+                    contextId = requestCode.toString()
                 )
             )
         }
@@ -61,7 +78,7 @@ class NotificationReceiver : BroadcastReceiver() {
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.app_logo)
             .setContentTitle("Looking for some discounts?")
-            .setContentText(expiryPrompt)  // Show Prompt here
+            .setContentText(displayText)  // Show Prompt here
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
@@ -79,7 +96,6 @@ class NotificationReceiver : BroadcastReceiver() {
         val hours = intent.getIntExtra("hours", 0)
         val minutes = intent.getIntExtra("minutes", 0)
 
-        println("620555 NotificationReceiver Rescheduling for next day at $hours:$minutes,$requestCode")
         // Set the calendar for the next day at the same time
         val calendar = Calendar.getInstance().apply {
             add(Calendar.DAY_OF_YEAR, 1)  // Move to the next day
@@ -107,5 +123,18 @@ class NotificationReceiver : BroadcastReceiver() {
             /* triggerAtMillis = */ calendar.timeInMillis,
             /* operation = */ pendingIntent
         )
+    }
+
+    private suspend fun getSumOfExpenses(recurrence: Recurrence): String {
+        var newList = emptyList<Expense>()
+        withContext(Dispatchers.IO) {
+            val (start, end) = calculateDateRange(recurrence, 0)
+            newList = realm.query<Expense>().find().filter {
+                (it.date.toLocalDate().isAfter(start) && it.date.toLocalDate()
+                    .isBefore(end)) || it.date.toLocalDate()
+                    .isEqual(start) || it.date.toLocalDate().isEqual(end)
+            }
+        }
+        return String.format(Locale.US, "%.2f", newList.sumOf { it.amount })
     }
 }

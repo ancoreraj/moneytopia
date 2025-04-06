@@ -45,6 +45,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.dimrnhhh.moneytopia.components.navigation.BottomNavItem
+import com.dimrnhhh.moneytopia.notifications.PermissionManager
+import com.dimrnhhh.moneytopia.notifications.createNotificationChannel
+import com.dimrnhhh.moneytopia.notifications.scheduleDailyNotification
 import com.dimrnhhh.moneytopia.pages.AboutPage
 import com.dimrnhhh.moneytopia.pages.AddExpensePage
 import com.dimrnhhh.moneytopia.pages.AnalyticsPage
@@ -72,6 +75,17 @@ class MainActivity : ComponentActivity() {
         // SharedPreferences to check if onboarding should be shown
         val sharedPreferences = getSharedPreferences("moneytopia_prefs", Context.MODE_PRIVATE)
         val isFirstTime = sharedPreferences.getBoolean("isFirstTime", true)
+
+        val permissionManager = PermissionManager(this)
+
+        if (!permissionManager.hasNotificationPermission()) {
+            permissionManager.requestNotificationPermission(this)
+        }else if (!permissionManager.hasExactAlarmPermission()) {
+            permissionManager.requestExactAlarmPermission(this)
+        } else {
+            createNotificationChannel(this)
+            scheduleDailyNotification(this)
+        }
 
         setContent {
             MoneytopiaTheme {

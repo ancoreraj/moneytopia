@@ -23,6 +23,9 @@
         tools:targetApi="tiramisu"
         android:localeConfig="@xml/locales_config"
         android:enableOnBackInvokedCallback="true">
+
+        <receiver android:name=".notifications.NotificationReceiver"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
