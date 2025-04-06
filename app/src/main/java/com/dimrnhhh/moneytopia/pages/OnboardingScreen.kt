@@ -66,6 +66,10 @@ fun OnboardingScreen(navController: NavController) {
         } else {
             Toast.makeText(context, "SMS Permission Denied", Toast.LENGTH_SHORT).show()
         }
+
+        if (!hasNotificationPermission) {
+            Toast.makeText(context, "Notification Permission Denied", Toast.LENGTH_SHORT).show()
+        }
     }
 
     LaunchedEffect(smsPermissionRequestCount.value, notificationPermissionRequestCount.value) {

@@ -94,5 +94,4 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.kotlinx.serialization.json)
-//    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21")
 }

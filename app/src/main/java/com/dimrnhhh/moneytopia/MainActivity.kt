@@ -85,12 +85,6 @@ class MainActivity : ComponentActivity() {
                         unselectedIcon = Icons.Outlined.AccountBalanceWallet,
                         route = "expenses"
                     ),
-//                    BottomNavItem(
-//                        title = stringResource(R.string.reports_title),
-//                        selectedIcon = Icons.Filled.Description,
-//                        unselectedIcon = Icons.Outlined.Description,
-//                        route = "reports"
-//                    ),
                     BottomNavItem(
                         title = stringResource(R.string.analytics_title),
                         selectedIcon = Icons.Filled.Analytics,
