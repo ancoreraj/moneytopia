@@ -12,43 +12,49 @@ import com.dimrnhhh.moneytopia.utils.epochToLocalDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 fun ingestSmsData(context: Context) {
     val contentResolver: ContentResolver = context.contentResolver
+
+    val threshold = getSmsThresholdInMillis()
+    println("620555 threshold $threshold")
+    val selection = "${Telephony.Sms.DATE} >= ?"
+    val selectionArgs = arrayOf(threshold.toString())
+    val sortOrder = "${Telephony.Sms.DATE} DESC"
+
     val cursor = contentResolver.query(
-        Telephony.Sms.CONTENT_URI,
-        null,
-        null,
-        null,
-        null
+        /* uri = */ Telephony.Sms.CONTENT_URI,
+        /* projection = */ null,
+        /* selection = */ selection,
+        /* selectionArgs = */ selectionArgs,
+        /* sortOrder = */ sortOrder
     )
 
-    if(cursor != null && cursor.moveToFirst()) {
-        var count = 0
+    cursor?.use {
+        if(it.moveToFirst()) {
+            do {
+                val id = it.getString(it.getColumnIndexOrThrow(Telephony.Sms._ID))
+                val address = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.ADDRESS))
+                val body = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.BODY))
+                val date = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.DATE))
+                val dateSent = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.DATE_SENT))
 
-        do {
-            count++;
-            if (count >= 1000) {
-                break;
-            }
-            val id = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms._ID))
-            val address = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.ADDRESS))
-            val body = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.BODY))
-            val date = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.DATE))
-            val dateSent = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.DATE_SENT))
+                println("620555 date $date dateSent $dateSent")
+                CoroutineScope(Dispatchers.IO).launch {
+                    saveData(
+                        SmsData(
+                            id = id,
+                            address = address,
+                            body = body,
+                            date = date,
+                            dateSent = dateSent
+                        )
+                    )
+                }
 
-            CoroutineScope(Dispatchers.IO).launch {
-            saveData(
-                SmsData(
-                    id = id,
-                    address = address,
-                    body = body,
-                    date = date,
-                    dateSent = dateSent
-                )
-            )}
-
-        } while (cursor.moveToNext())
+            } while (it.moveToNext())
+        }
     }
 }
 
@@ -73,4 +79,15 @@ suspend fun saveData(smsData: SmsData) {
         Log.d("Exception", e.message.toString())
     }
 
+}
+
+fun getSmsThresholdInMillis(): Long {
+    val calendar = Calendar.getInstance()
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+    val monthsToSubtract = if (day > 15) 2 else 3
+    calendar.set(Calendar.DAY_OF_MONTH, 1)
+    calendar.add(Calendar.MONTH, -monthsToSubtract)
+
+    return calendar.timeInMillis
 }
