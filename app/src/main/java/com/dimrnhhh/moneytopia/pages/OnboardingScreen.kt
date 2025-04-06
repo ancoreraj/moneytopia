@@ -32,6 +32,7 @@ import androidx.navigation.NavController
 import com.dimrnhhh.moneytopia.components.charts.HorizontalPagerIndicator
 import com.dimrnhhh.moneytopia.smsHandling.checkNotificationPermission
 import com.dimrnhhh.moneytopia.smsHandling.checkSmsPermission
+import com.dimrnhhh.moneytopia.smsHandling.checkSmsReceivePermission
 import com.dimrnhhh.moneytopia.smsHandling.ingestSmsData
 
 @Composable
@@ -44,27 +45,39 @@ fun OnboardingScreen(navController: NavController) {
     )
 
     val permissionsList =
-        arrayOf(Manifest.permission.READ_SMS, Manifest.permission.POST_NOTIFICATIONS)
+        arrayOf(
+            Manifest.permission.READ_SMS,
+            Manifest.permission.RECEIVE_SMS,
+            Manifest.permission.POST_NOTIFICATIONS
+        )
 
     var hasSmsPermission by remember { mutableStateOf(checkSmsPermission(context)) }
     var hasNotificationPermission by remember { mutableStateOf(checkNotificationPermission(context)) }
+    var hasSmsReceivePermission by remember { mutableStateOf(checkSmsReceivePermission(context)) }
 
     val smsPermissionRequestCount = remember { mutableStateOf(0) }
     val notificationPermissionRequestCount = remember { mutableStateOf(0) }
+    val smsReceivePermissionCount = remember { mutableStateOf(0) }
 
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         hasSmsPermission = permissions[Manifest.permission.READ_SMS] ?: false
         hasNotificationPermission = permissions[Manifest.permission.POST_NOTIFICATIONS] ?: false
+        hasSmsReceivePermission = permissions[Manifest.permission.RECEIVE_SMS] ?: false
 
         smsPermissionRequestCount.value++
         notificationPermissionRequestCount.value++
+        smsReceivePermissionCount.value++
 
         if (hasSmsPermission) {
             ingestSmsData(context)
         } else {
             Toast.makeText(context, "SMS Permission Denied", Toast.LENGTH_SHORT).show()
+        }
+
+        if (!hasSmsReceivePermission) {
+            Toast.makeText(context, "SMS Receive Permission Denied", Toast.LENGTH_SHORT).show()
         }
 
         if (!hasNotificationPermission) {
@@ -74,11 +87,13 @@ fun OnboardingScreen(navController: NavController) {
 
     LaunchedEffect(smsPermissionRequestCount.value, notificationPermissionRequestCount.value) {
         if ((!hasSmsPermission && smsPermissionRequestCount.value == 1) ||
-            (!hasNotificationPermission && notificationPermissionRequestCount.value == 1)
+            (!hasNotificationPermission && notificationPermissionRequestCount.value == 1) ||
+            (!hasSmsReceivePermission && smsReceivePermissionCount.value == 1)
         ) {
             requestPermissionLauncher.launch(permissionsList)
-        } else if ((hasSmsPermission && hasNotificationPermission) ||
-            (smsPermissionRequestCount.value == 2 || notificationPermissionRequestCount.value == 2)
+        } else if ((hasSmsPermission && hasNotificationPermission && hasSmsReceivePermission) ||
+            (smsPermissionRequestCount.value == 2 || notificationPermissionRequestCount.value == 2 ||
+                    smsReceivePermissionCount.value == 2)
         ) {
             onGetStarted(sharedPreferences, context, navController)
         }
@@ -121,7 +136,7 @@ fun OnboardingScreen(navController: NavController) {
                 ) {
                     if (pagerState.currentPage == pages.size - 1) {
                         Button(onClick = {
-                            if (hasSmsPermission && hasNotificationPermission) {
+                            if (hasSmsPermission && hasNotificationPermission && hasSmsReceivePermission) {
                                 onGetStarted(sharedPreferences, context, navController)
                             } else {
                                 requestPermissionLauncher.launch(permissionsList)
