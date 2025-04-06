@@ -77,7 +77,7 @@ class NotificationReceiver : BroadcastReceiver() {
 
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.app_logo)
-            .setContentTitle("Looking for some discounts?")
+            .setContentTitle("Daily Expense Report")
             .setContentText(displayText)  // Show Prompt here
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
