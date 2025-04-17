@@ -8,6 +8,10 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import com.dimrnhhh.moneytopia.MainActivity
+import com.dimrnhhh.moneytopia.R
 import java.util.Calendar
 import kotlin.random.Random
 
@@ -82,6 +86,48 @@ fun scheduleNotification(
         /* intervalMillis = */ AlarmManager.INTERVAL_DAY,
         /* operation = */ pendingIntent
     )
+}
+
+@SuppressLint("MissingPermission")
+fun showNotification(
+    context: Context,
+    displayText: String,
+    notificationId: Int,
+    requestCode: Int,
+) {
+    val channelId = "daily_notification_channel"
+
+    // Create an intent to open MainActivity when the notification is clicked
+    val notificationIntent = Intent(context, MainActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        putExtra(
+            "notificationIntentData",
+            NotificationIntentData(
+                context = "24_HOURS_EXPENSE_NOTIFICATION",
+                contextId = requestCode.toString()
+            )
+        )
+    }
+
+    // Create a pending intent
+    val pendingIntent = PendingIntent.getActivity(
+        context,
+        notificationId,
+        notificationIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+
+    val builder = NotificationCompat.Builder(context, channelId)
+        .setSmallIcon(R.drawable.app_logo)
+        .setContentTitle("Daily Expense Report")
+        .setContentText(displayText)  // Show Prompt here
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        .setContentIntent(pendingIntent)
+        .setAutoCancel(true)
+
+    with(NotificationManagerCompat.from(context)) {
+        notify(notificationId, builder.build())
+    }
 }
 
 fun generateRandomTimeBetween9PMAnd1030PM(): Pair<Int, Int> {
