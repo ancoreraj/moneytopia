@@ -6,13 +6,18 @@ import android.provider.Telephony
 import android.util.Log
 import com.dimrnhhh.moneytopia.database.realm
 import com.dimrnhhh.moneytopia.models.Expense
+import com.dimrnhhh.moneytopia.models.ExpenseSource
 import com.dimrnhhh.moneytopia.models.Recurrence
 import com.dimrnhhh.moneytopia.models.SmsData
+import com.dimrnhhh.moneytopia.utils.calculateDateRange
 import com.dimrnhhh.moneytopia.utils.epochToLocalDateTime
+import io.realm.kotlin.ext.query
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
+import java.util.Locale
 
 fun ingestSmsData(context: Context) {
     val contentResolver: ContentResolver = context.contentResolver
@@ -32,7 +37,7 @@ fun ingestSmsData(context: Context) {
     )
 
     cursor?.use {
-        if(it.moveToFirst()) {
+        if (it.moveToFirst()) {
             do {
                 val id = it.getString(it.getColumnIndexOrThrow(Telephony.Sms._ID))
                 val address = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.ADDRESS))
@@ -72,16 +77,24 @@ suspend fun saveData(smsData: SmsData) {
             return
         }
 
-        val expense = Expense(transactionInfo.transaction.amount.toDouble(), smsData.address, timeOfTransaction, Recurrence.None, "SMS_DATA" )
+        val expense = Expense(
+            amount = transactionInfo.transaction.amount.toDouble(),
+            category = smsData.address,
+            date = timeOfTransaction,
+            recurrence = Recurrence.None,
+            note = "SMS_DATA",
+            smsId = smsData.id,
+            source = ExpenseSource.SMS
+        )
 
         realm.write { this.copyToRealm(expense) }
-    } catch (e : Exception) {
+    } catch (e: Exception) {
         Log.d("Exception", e.message.toString())
     }
 
 }
 
-fun getSmsThresholdInMillis(): Long {
+fun getSmsThresholdInMillis(): Long { // TODO: make this dynamic
     val calendar = Calendar.getInstance()
     val day = calendar.get(Calendar.DAY_OF_MONTH)
 
@@ -91,3 +104,22 @@ fun getSmsThresholdInMillis(): Long {
 
     return calendar.timeInMillis
 }
+
+suspend fun getSumOfExpenses(recurrence: Recurrence): String {
+    var newList = emptyList<Expense>()
+    withContext(Dispatchers.IO) {
+        val (start, end) = calculateDateRange(recurrence, 0)
+        newList = realm.query<Expense>().find().filter {
+            (it.date.toLocalDate().isAfter(start) && it.date.toLocalDate()
+                .isBefore(end)) || it.date.toLocalDate()
+                .isEqual(start) || it.date.toLocalDate().isEqual(end)
+        }
+    }
+    return String.format(Locale.US, "%.2f", newList.sumOf { it.amount })
+}
+
+fun doesSmsExist(smsId: String): Boolean =
+    realm.query<Expense>("smsId == $0 AND note == $1", smsId, "SMS_DATA")
+        .find()
+        .isNotEmpty()
+
