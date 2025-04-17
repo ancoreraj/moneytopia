@@ -73,19 +73,6 @@ class MainActivity : ComponentActivity() {
         // SharedPreferences to check if onboarding should be shown
         val sharedPreferences = getSharedPreferences("moneytopia_prefs", Context.MODE_PRIVATE)
         val isFirstTime = sharedPreferences.getBoolean("isFirstTime", true)
-        val isNotificationScheduled = sharedPreferences.getBoolean("isNotificationScheduled", false)
-
-        val permissionManager = PermissionManager(this)
-
-        if (!permissionManager.hasNotificationPermission()) {
-            permissionManager.requestNotificationPermission(this)
-        } else if (!permissionManager.hasExactAlarmPermission()) {
-            permissionManager.requestExactAlarmPermission(this)
-        } else if (!isNotificationScheduled) {
-            createNotificationChannel(this)
-            scheduleDailyNotification(this)
-            sharedPreferences.edit { putBoolean("isNotificationScheduled", false) }
-        }
 
         setContent {
             MoneytopiaTheme {
