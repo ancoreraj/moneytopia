@@ -76,7 +76,6 @@ suspend fun saveData(smsData: SmsData) {
         ) {
             return
         }
-
         val expense = Expense(
             amount = transactionInfo.transaction.amount.toDouble(),
             category = smsData.address,
@@ -87,7 +86,8 @@ suspend fun saveData(smsData: SmsData) {
             source = ExpenseSource.SMS
         )
 
-        realm.write { this.copyToRealm(expense) }
+        if (!doesSmsExist(smsId = smsData.id))
+            realm.write { this.copyToRealm(expense) }
     } catch (e: Exception) {
         Log.d("Exception", e.message.toString())
     }
@@ -108,7 +108,7 @@ fun getSmsThresholdInMillis(): Long { // TODO: make this dynamic
 suspend fun getSumOfExpenses(recurrence: Recurrence): String {
     var newList = emptyList<Expense>()
     withContext(Dispatchers.IO) {
-        val (start, end) = calculateDateRange(recurrence, 0)
+        val (start, end) = calculateDateRange(recurrence, 1)
         newList = realm.query<Expense>().find().filter {
             (it.date.toLocalDate().isAfter(start) && it.date.toLocalDate()
                 .isBefore(end)) || it.date.toLocalDate()
