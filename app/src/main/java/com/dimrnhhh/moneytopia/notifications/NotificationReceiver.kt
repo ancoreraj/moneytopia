@@ -10,17 +10,12 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.dimrnhhh.moneytopia.MainActivity
 import com.dimrnhhh.moneytopia.R
-import com.dimrnhhh.moneytopia.database.realm
-import com.dimrnhhh.moneytopia.models.Expense
 import com.dimrnhhh.moneytopia.models.Recurrence
-import com.dimrnhhh.moneytopia.utils.calculateDateRange
-import io.realm.kotlin.ext.query
+import com.dimrnhhh.moneytopia.smsHandling.getSumOfExpenses
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.Calendar
-import java.util.Locale
 
 class NotificationReceiver : BroadcastReceiver() {
 
@@ -39,7 +34,7 @@ class NotificationReceiver : BroadcastReceiver() {
                     notificationId = requestCode,
                     requestCode = requestCode
                 )
-                rescheduleForNextDay(context, intent)
+//                rescheduleForNextDay(context, intent)
             }
         }
 
@@ -123,18 +118,5 @@ class NotificationReceiver : BroadcastReceiver() {
             /* triggerAtMillis = */ calendar.timeInMillis,
             /* operation = */ pendingIntent
         )
-    }
-
-    private suspend fun getSumOfExpenses(recurrence: Recurrence): String {
-        var newList = emptyList<Expense>()
-        withContext(Dispatchers.IO) {
-            val (start, end) = calculateDateRange(recurrence, 0)
-            newList = realm.query<Expense>().find().filter {
-                (it.date.toLocalDate().isAfter(start) && it.date.toLocalDate()
-                    .isBefore(end)) || it.date.toLocalDate()
-                    .isEqual(start) || it.date.toLocalDate().isEqual(end)
-            }
-        }
-        return String.format(Locale.US, "%.2f", newList.sumOf { it.amount })
     }
 }
