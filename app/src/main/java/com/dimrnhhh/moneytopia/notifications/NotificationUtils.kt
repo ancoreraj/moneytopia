@@ -76,9 +76,10 @@ fun scheduleNotification(
     }
 
     // Set exact alarm to fire at the specified time
-    alarmManager.setExactAndAllowWhileIdle(
+    alarmManager.setRepeating(
         /* type = */ AlarmManager.RTC_WAKEUP,
         /* triggerAtMillis = */ calendar.timeInMillis,
+        /* intervalMillis = */ AlarmManager.INTERVAL_DAY,
         /* operation = */ pendingIntent
     )
 }
