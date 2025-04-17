@@ -6,7 +6,7 @@ import org.mongodb.kbson.ObjectId
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-class Expense(): RealmObject {
+class Expense() : RealmObject {
     @PrimaryKey
     var _id: ObjectId = ObjectId()
     var amount: Double = 0.0
@@ -22,20 +22,31 @@ class Expense(): RealmObject {
             return _recurrenceName.toRecurrence()
         }
     var note: String = ""
+    var smsId: String = ""
+    var source: String = ""
 
     constructor(
         amount: Double,
         category: String,
         date: LocalDateTime,
         recurrence: Recurrence,
-        note: String
-    ): this() {
+        note: String,
+        smsId: String,
+        source: ExpenseSource
+    ) : this() {
         this.amount = amount
         this.category = category
         this._dateValue = date.toString()
         this._recurrenceName
         this.note = note
+        this.smsId = smsId
+        this.source = source.name
     }
+}
+
+enum class ExpenseSource {
+    SMS,
+    MANUAL
 }
 
 class DayExpenses(
@@ -49,7 +60,7 @@ fun List<Expense>.groupedByDay(): Map<LocalDate, DayExpenses> {
     this.forEach {
         val date = it.date.toLocalDate()
 
-        if(dataMap[date] == null) {
+        if (dataMap[date] == null) {
             dataMap[date] = DayExpenses(
                 expenses = mutableListOf(),
                 total = 0.0
