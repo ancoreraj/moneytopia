@@ -19,12 +19,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material.icons.outlined.Analytics
-import androidx.compose.material.icons.outlined.Description
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -38,6 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.core.content.edit
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -61,6 +58,7 @@ import com.dimrnhhh.moneytopia.viewmodels.MainViewModel
 
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModels<MainViewModel>()
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,16 +73,18 @@ class MainActivity : ComponentActivity() {
         // SharedPreferences to check if onboarding should be shown
         val sharedPreferences = getSharedPreferences("moneytopia_prefs", Context.MODE_PRIVATE)
         val isFirstTime = sharedPreferences.getBoolean("isFirstTime", true)
+        val isNotificationScheduled = sharedPreferences.getBoolean("isNotificationScheduled", false)
 
         val permissionManager = PermissionManager(this)
 
         if (!permissionManager.hasNotificationPermission()) {
             permissionManager.requestNotificationPermission(this)
-        }else if (!permissionManager.hasExactAlarmPermission()) {
+        } else if (!permissionManager.hasExactAlarmPermission()) {
             permissionManager.requestExactAlarmPermission(this)
-        } else {
+        } else if (!isNotificationScheduled) {
             createNotificationChannel(this)
             scheduleDailyNotification(this)
+            sharedPreferences.edit { putBoolean("isNotificationScheduled", false) }
         }
 
         setContent {
@@ -115,31 +115,37 @@ class MainActivity : ComponentActivity() {
                     bottomBarState.value = false
                     fabState.value = false
                 } else {
-                    when(backStackEntry?.destination?.route) {
+                    when (backStackEntry?.destination?.route) {
                         "expenses" -> {
                             bottomBarState.value = true
                             fabState.value = true
                         }
+
                         "expenses/add_expenses" -> {
                             bottomBarState.value = false
                             fabState.value = false
                         }
+
                         "reports" -> {
                             bottomBarState.value = true
                             fabState.value = false
                         }
+
                         "analytics" -> {
                             bottomBarState.value = true
                             fabState.value = false
                         }
+
                         "settings" -> {
                             bottomBarState.value = true
                             fabState.value = false
                         }
+
                         "settings/languages" -> {
                             bottomBarState.value = false
                             fabState.value = false
                         }
+
                         "settings/about" -> {
                             bottomBarState.value = false
                             fabState.value = false
@@ -179,7 +185,7 @@ class MainActivity : ComponentActivity() {
                                             navController.navigate(it.route) {
                                                 popUpTo(navController.graph.findStartDestination().id) {
                                                     saveState = false
-                                                    if(it.route == "expenses") {
+                                                    if (it.route == "expenses") {
                                                         inclusive = true
                                                     }
                                                 }
@@ -195,7 +201,7 @@ class MainActivity : ComponentActivity() {
                                         },
                                         icon = {
                                             Icon(
-                                                imageVector = if(backStackEntry?.destination?.route == it.route) {
+                                                imageVector = if (backStackEntry?.destination?.route == it.route) {
                                                     it.selectedIcon
                                                 } else it.unselectedIcon,
                                                 contentDescription = it.title
@@ -211,14 +217,14 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = if (isFirstTime) "onboarding" else "expenses",
                         enterTransition = {
-                            if(initialState.destination.route == backStackEntry?.destination?.route) {
+                            if (initialState.destination.route == backStackEntry?.destination?.route) {
                                 fadeIn(animationSpec = tween(durationMillis = 1))
                             } else {
                                 fadeIn(animationSpec = tween(durationMillis = 500))
                             }
                         },
                         exitTransition = {
-                            if(initialState.destination.route == backStackEntry?.destination?.route) {
+                            if (initialState.destination.route == backStackEntry?.destination?.route) {
                                 fadeOut(animationSpec = tween(durationMillis = 1))
                             } else {
                                 fadeOut(animationSpec = tween(durationMillis = 500))
