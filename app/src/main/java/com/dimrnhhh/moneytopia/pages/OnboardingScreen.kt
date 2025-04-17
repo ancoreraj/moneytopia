@@ -28,8 +28,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import androidx.navigation.NavController
 import com.dimrnhhh.moneytopia.components.charts.HorizontalPagerIndicator
+import com.dimrnhhh.moneytopia.notifications.createNotificationChannel
+import com.dimrnhhh.moneytopia.notifications.scheduleDailyNotification
 import com.dimrnhhh.moneytopia.smsHandling.checkNotificationPermission
 import com.dimrnhhh.moneytopia.smsHandling.checkSmsPermission
 import com.dimrnhhh.moneytopia.smsHandling.checkSmsReceivePermission
@@ -59,6 +62,8 @@ fun OnboardingScreen(navController: NavController) {
     val notificationPermissionRequestCount = remember { mutableStateOf(0) }
     val smsReceivePermissionCount = remember { mutableStateOf(0) }
 
+    val isNotificationScheduled = sharedPreferences.getBoolean("isNotificationScheduled", false)
+
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -80,7 +85,13 @@ fun OnboardingScreen(navController: NavController) {
             Toast.makeText(context, "SMS Receive Permission Denied", Toast.LENGTH_SHORT).show()
         }
 
-        if (!hasNotificationPermission) {
+        if (hasNotificationPermission) {
+            if (!isNotificationScheduled) {
+                createNotificationChannel(context)
+                scheduleDailyNotification(context)
+                sharedPreferences.edit { putBoolean("isNotificationScheduled", true) }
+            }
+        } else {
             Toast.makeText(context, "Notification Permission Denied", Toast.LENGTH_SHORT).show()
         }
     }
