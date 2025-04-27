@@ -3,6 +3,7 @@ package com.dimrnhhh.moneytopia.notifications
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.dimrnhhh.moneytopia.notifications.NotificationUtils.showNotification
 import com.dimrnhhh.moneytopia.smsHandling.getSumOfExpensesInLastNHours
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

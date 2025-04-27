@@ -35,8 +35,8 @@ import com.dimrnhhh.moneytopia.smsHandling.checkNotificationPermission
 import com.dimrnhhh.moneytopia.smsHandling.checkSmsPermission
 import com.dimrnhhh.moneytopia.smsHandling.checkSmsReceivePermission
 import com.dimrnhhh.moneytopia.smsHandling.ingestSmsData
-import com.dimrnhhh.moneytopia.notifications.EventScheduler.createNotificationChannel
-import com.dimrnhhh.moneytopia.notifications.EventScheduler.scheduleDailyNotification
+import com.dimrnhhh.moneytopia.notifications.NotificationUtils.createNotificationChannel
+import com.dimrnhhh.moneytopia.notifications.NotificationUtils.scheduleDailyNotification
 
 @Composable
 fun OnboardingScreen(navController: NavController) {

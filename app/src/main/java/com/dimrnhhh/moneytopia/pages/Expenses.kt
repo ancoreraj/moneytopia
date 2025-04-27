@@ -45,8 +45,8 @@ import com.dimrnhhh.moneytopia.R
 import com.dimrnhhh.moneytopia.components.expenses.ExpensesByDay
 import com.dimrnhhh.moneytopia.components.header.AlertDialogInfo
 import com.dimrnhhh.moneytopia.components.header.HeaderPage
-import com.dimrnhhh.moneytopia.notifications.EventScheduler.createNotificationChannel
-import com.dimrnhhh.moneytopia.notifications.EventScheduler.scheduleDailyNotification
+import com.dimrnhhh.moneytopia.notifications.NotificationUtils.createNotificationChannel
+import com.dimrnhhh.moneytopia.notifications.NotificationUtils.scheduleDailyNotification
 import com.dimrnhhh.moneytopia.smsHandling.checkNotificationPermission
 import com.dimrnhhh.moneytopia.smsHandling.checkSmsPermission
 import com.dimrnhhh.moneytopia.smsHandling.checkSmsReceivePermission
