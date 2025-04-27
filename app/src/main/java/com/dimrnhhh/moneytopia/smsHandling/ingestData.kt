@@ -16,14 +16,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 fun ingestSmsData(context: Context) {
     val contentResolver: ContentResolver = context.contentResolver
 
-    val threshold = getSmsThresholdInMillis()
-    println("620555 threshold $threshold")
+    val threshold = getSmsThresholdStartDateInMillis()
     val selection = "${Telephony.Sms.DATE} >= ?"
     val selectionArgs = arrayOf(threshold.toString())
     val sortOrder = "${Telephony.Sms.DATE} DESC"
@@ -37,6 +39,7 @@ fun ingestSmsData(context: Context) {
     )
 
     cursor?.use {
+        val smsList = mutableListOf<SmsData>()
         if (it.moveToFirst()) {
             do {
                 val id = it.getString(it.getColumnIndexOrThrow(Telephony.Sms._ID))
@@ -45,20 +48,22 @@ fun ingestSmsData(context: Context) {
                 val date = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.DATE))
                 val dateSent = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.DATE_SENT))
 
-                println("620555 date $date dateSent $dateSent")
-                CoroutineScope(Dispatchers.IO).launch {
-                    saveData(
-                        SmsData(
-                            id = id,
-                            address = address,
-                            body = body,
-                            date = date,
-                            dateSent = dateSent
-                        )
+                smsList.add(
+                    SmsData(
+                        id = id,
+                        address = address,
+                        body = body,
+                        date = date,
+                        dateSent = dateSent
                     )
-                }
+                )
 
             } while (it.moveToNext())
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            smsList.forEach {
+                saveData(it)
+            }
         }
     }
 }
@@ -86,40 +91,58 @@ suspend fun saveData(smsData: SmsData) {
             source = ExpenseSource.SMS
         )
 
-        if (!doesSmsExist(smsId = smsData.id))
-            realm.write { this.copyToRealm(expense) }
+        if (doesSmsExist(smsId = smsData.id)) return
+
+        realm.write {
+            this.copyToRealm(expense)
+        }
     } catch (e: Exception) {
         Log.d("Exception", e.message.toString())
     }
 
 }
 
-fun getSmsThresholdInMillis(): Long { // TODO: make this dynamic
+fun getSmsThresholdStartDateInMillis(): Long {
     val calendar = Calendar.getInstance()
-    val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-    val monthsToSubtract = if (day > 15) 2 else 3
-    calendar.set(Calendar.DAY_OF_MONTH, 1)
+    val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
+    val monthsToSubtract = if (dayOfMonth > 15) 2 else 3
     calendar.add(Calendar.MONTH, -monthsToSubtract)
+
+    // Set to first day of that month
+    calendar.set(Calendar.DAY_OF_MONTH, 1)
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
 
     return calendar.timeInMillis
 }
 
-suspend fun getSumOfExpenses(recurrence: Recurrence): String {
-    var newList = emptyList<Expense>()
+suspend fun getSumOfExpensesInLastNHours(hours: Int): String {
+    var expenses = emptyList<Expense>()
     withContext(Dispatchers.IO) {
-        val (start, end) = calculateDateRange(recurrence, 1)
-        newList = realm.query<Expense>().find().filter {
-            (it.date.toLocalDate().isAfter(start) && it.date.toLocalDate()
-                .isBefore(end)) || it.date.toLocalDate()
-                .isEqual(start) || it.date.toLocalDate().isEqual(end)
+        val now = LocalDateTime.now()
+        val startTime = now.minusHours(hours.toLong())
+
+        expenses = realm.query<Expense>().find().filter {
+            it.date.isAfter(startTime) &&
+                    (it.date.isEqual(now) || it.date.isBefore(now))
         }
     }
-    return String.format(Locale.US, "%.2f", newList.sumOf { it.amount })
+    val total = expenses.sumOf { it.amount }
+
+    return String.format(Locale.ENGLISH, "%.2f", total)
 }
 
-fun doesSmsExist(smsId: String): Boolean =
-    realm.query<Expense>("smsId == $0 AND note == $1", smsId, "SMS_DATA")
+fun doesSmsExist(smsId: String): Boolean {
+    val ans = realm.query<Expense>("smsId == $0", smsId)
         .find()
-        .isNotEmpty()
+    return ans.isNotEmpty()
+}
 
+fun formattedThreshold(threshold: Long): String {
+    val thresholdDateTime = Date(threshold)
+    val formatter = SimpleDateFormat("dd MMM yyyy HH:mm:ss", Locale.getDefault())
+    val formattedThreshold = formatter.format(thresholdDateTime)
+    return formattedThreshold
+}

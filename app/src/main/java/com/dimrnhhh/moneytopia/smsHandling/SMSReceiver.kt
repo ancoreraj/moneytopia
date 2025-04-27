@@ -26,6 +26,7 @@ class SmsReceiver : BroadcastReceiver() {
             )
 
             cursor?.use {
+                val smsList = mutableListOf<SmsData>()
                 if (it.moveToFirst()) {
                     do {
                         val id = it.getString(it.getColumnIndexOrThrow(Telephony.Sms._ID))
@@ -38,18 +39,21 @@ class SmsReceiver : BroadcastReceiver() {
                         // check if the above entry exists
                         if (doesSmsExist(id)) break
 
-                        CoroutineScope(Dispatchers.IO).launch {
-                            saveData(
-                                SmsData(
-                                    id = id,
-                                    address = address,
-                                    body = body,
-                                    date = date,
-                                    dateSent = dateSent
-                                )
+                        smsList.add(
+                            SmsData(
+                                id = id,
+                                address = address,
+                                body = body,
+                                date = date,
+                                dateSent = dateSent
                             )
-                        }
+                        )
                     } while (it.moveToNext())
+                }
+                CoroutineScope(Dispatchers.IO).launch {
+                    smsList.forEach {
+                        saveData(it)
+                    }
                 }
             }
         }

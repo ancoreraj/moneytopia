@@ -31,12 +31,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.navigation.NavController
 import com.dimrnhhh.moneytopia.components.charts.HorizontalPagerIndicator
-import com.dimrnhhh.moneytopia.notifications.createNotificationChannel
-import com.dimrnhhh.moneytopia.notifications.scheduleDailyNotification
 import com.dimrnhhh.moneytopia.smsHandling.checkNotificationPermission
 import com.dimrnhhh.moneytopia.smsHandling.checkSmsPermission
 import com.dimrnhhh.moneytopia.smsHandling.checkSmsReceivePermission
 import com.dimrnhhh.moneytopia.smsHandling.ingestSmsData
+import com.dimrnhhh.moneytopia.notifications.EventScheduler.createNotificationChannel
+import com.dimrnhhh.moneytopia.notifications.EventScheduler.scheduleDailyNotification
 
 @Composable
 fun OnboardingScreen(navController: NavController) {

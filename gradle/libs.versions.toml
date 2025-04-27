@@ -19,6 +19,9 @@ lifecycleViewmodelCompose = "2.8.7"
 appcompat = "1.7.0"
 vicoCompose = "1.16.0"
 kotlinxSerializationJson = "1.6.0"
+retrofit = "2.11.0"
+loggingInterceptor = "5.0.0-alpha.3"
+workManager = "2.9.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -47,6 +50,11 @@ patrykandpatrick-vico-core = { module = "com.patrykandpatrick.vico:core", versio
 patrykandpatrick-vico-compose = { module = "com.patrykandpatrick.vico:compose", version.ref = "vicoCompose" }
 patrykandpatrick-vico-compose-m3 = { module = "com.patrykandpatrick.vico:compose-m3", version.ref = "vicoCompose" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
+androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "workManager" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workManager" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

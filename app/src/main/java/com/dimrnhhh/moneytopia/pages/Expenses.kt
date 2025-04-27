@@ -1,15 +1,10 @@
 package com.dimrnhhh.moneytopia.pages
 
 import android.Manifest
-import android.content.ContentResolver
 import android.content.Context
-import android.content.pm.PackageManager
-import android.provider.Telephony
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -50,8 +45,8 @@ import com.dimrnhhh.moneytopia.R
 import com.dimrnhhh.moneytopia.components.expenses.ExpensesByDay
 import com.dimrnhhh.moneytopia.components.header.AlertDialogInfo
 import com.dimrnhhh.moneytopia.components.header.HeaderPage
-import com.dimrnhhh.moneytopia.notifications.createNotificationChannel
-import com.dimrnhhh.moneytopia.notifications.scheduleDailyNotification
+import com.dimrnhhh.moneytopia.notifications.EventScheduler.createNotificationChannel
+import com.dimrnhhh.moneytopia.notifications.EventScheduler.scheduleDailyNotification
 import com.dimrnhhh.moneytopia.smsHandling.checkNotificationPermission
 import com.dimrnhhh.moneytopia.smsHandling.checkSmsPermission
 import com.dimrnhhh.moneytopia.smsHandling.checkSmsReceivePermission
@@ -148,7 +143,7 @@ fun ExpensesPage(
                     title = stringResource(R.string.expenses_title),
                     onClick = { openAlertDialog.value = true }
                 )
-                if(openAlertDialog.value) {
+                if (openAlertDialog.value) {
                     AlertDialogInfo(
                         onDismissRequest = { openAlertDialog.value = false },
                         onConfirmation = { openAlertDialog.value = false },
@@ -159,7 +154,7 @@ fun ExpensesPage(
             }
         }
     ) { contentPadding ->
-        Log.d("contentPadding",contentPadding.toString())
+        Log.d("contentPadding", contentPadding.toString())
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -187,7 +182,9 @@ fun ExpensesPage(
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
-                        text = stringResource(R.string.currency) + DecimalFormat(stringResource(R.string.number_format)).format(state.sumTotalToday),
+                        text = stringResource(R.string.currency) + DecimalFormat(stringResource(R.string.number_format)).format(
+                            state.sumTotalToday
+                        ),
                         style = MaterialTheme.typography.titleMedium,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.SemiBold
