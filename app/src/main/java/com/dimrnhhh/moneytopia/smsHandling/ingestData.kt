@@ -39,7 +39,6 @@ fun ingestSmsData(context: Context) {
     )
 
     cursor?.use {
-        val smsList = mutableListOf<SmsData>()
         if (it.moveToFirst()) {
             do {
                 val id = it.getString(it.getColumnIndexOrThrow(Telephony.Sms._ID))
@@ -48,22 +47,18 @@ fun ingestSmsData(context: Context) {
                 val date = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.DATE))
                 val dateSent = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.DATE_SENT))
 
-                smsList.add(
-                    SmsData(
-                        id = id,
-                        address = address,
-                        body = body,
-                        date = date,
-                        dateSent = dateSent
+                CoroutineScope(Dispatchers.IO).launch {
+                    saveData(
+                        SmsData(
+                            id = id,
+                            address = address,
+                            body = body,
+                            date = date,
+                            dateSent = dateSent
+                        )
                     )
-                )
-
+                }
             } while (it.moveToNext())
-        }
-        CoroutineScope(Dispatchers.IO).launch {
-            smsList.forEach {
-                saveData(it)
-            }
         }
     }
 }
@@ -77,7 +72,8 @@ suspend fun saveData(smsData: SmsData) {
             transactionInfo.account.type == null ||
             transactionInfo.transaction.type == null ||
             transactionInfo.transaction.amount == null ||
-            timeOfTransaction == null
+            timeOfTransaction == null ||
+            transactionInfo.transaction.type == "credit"
         ) {
             return
         }
