@@ -40,7 +40,7 @@ fun ExpensesDayGroup(
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            dayExpenses.expenses.forEach {
+            dayExpenses.expenses.sortedByDescending { it.date }.forEach {
                 ExpensesRow(expense = it, navController = navController)
             }
             ListItem(
@@ -70,13 +70,19 @@ fun ExpensesDayGroup(
                 },
                 trailingContent = {
                     Text(
-                        text = stringResource(R.string.total_currency) + DecimalFormat(stringResource(R.string.number_format)).format(dayExpenses.total),
+                        text = stringResource(R.string.total_currency) + DecimalFormat(
+                            stringResource(R.string.number_format)
+                        ).format(dayExpenses.total),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.primary
                     )
                 },
-                colors = ListItemDefaults.colors(MaterialTheme.colorScheme.surfaceColorAtElevation(50.dp))
+                colors = ListItemDefaults.colors(
+                    MaterialTheme.colorScheme.surfaceColorAtElevation(
+                        50.dp
+                    )
+                )
             )
         }
     }
