@@ -365,9 +365,9 @@ fun getTransactionType(message: MessageType): TransactionType? {
     )
 
     return when {
+        creditPattern.containsMatchIn(message.toString()) -> "credit"
         debitPattern.containsMatchIn(message.toString()) -> "debit"
         miscPattern.containsMatchIn(message.toString()) -> "debit"
-        creditPattern.containsMatchIn(message.toString()) -> "credit"
         else -> null
     }
 }
