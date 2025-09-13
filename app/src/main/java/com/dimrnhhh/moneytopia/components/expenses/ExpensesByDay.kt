@@ -65,7 +65,7 @@ fun ExpensesByDay(
             }
             groupedExpenses.keys.forEach {
                 Text(
-                    text = it.toString(),
+                    text = it.formatDay(),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )

@@ -18,3 +18,10 @@ fun checkNotificationPermission(context: Context): Boolean {
         Manifest.permission.POST_NOTIFICATIONS
     ) == PackageManager.PERMISSION_GRANTED
 }
+
+fun checkSmsReceivePermission(context: Context): Boolean {
+    return ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.RECEIVE_SMS
+    ) == PackageManager.PERMISSION_GRANTED
+}

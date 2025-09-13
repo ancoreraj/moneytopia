@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dimrnhhh.moneytopia.database.realm
 import com.dimrnhhh.moneytopia.models.Expense
+import com.dimrnhhh.moneytopia.models.ExpenseSource
 import com.dimrnhhh.moneytopia.models.Recurrence
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.UUID
 
 data class AddExpenseState(
     val amount: String = "",
@@ -22,16 +24,16 @@ data class AddExpenseState(
     val note: String = ""
 )
 
-class AddExpenseViewModel: ViewModel() {
+class AddExpenseViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(AddExpenseState())
     val uiState: StateFlow<AddExpenseState> = _uiState.asStateFlow()
 
     fun setAmount(amount: String) {
         var parsed = amount.toDoubleOrNull()
-        if(amount.isEmpty()) {
+        if (amount.isEmpty()) {
             parsed = 0.0
         }
-        if(parsed != null) {
+        if (parsed != null) {
             _uiState.update {
                 it.copy(
                     amount = amount.trim().ifEmpty { "" }
@@ -70,11 +72,13 @@ class AddExpenseViewModel: ViewModel() {
             realm.write {
                 this.copyToRealm(
                     Expense(
-                        _uiState.value.amount.toDouble(),
-                        _uiState.value.category,
-                        _uiState.value.date.atTime(now.hour, now.minute, now.second),
-                        _uiState.value.recurrence,
-                        _uiState.value.note
+                        amount = _uiState.value.amount.toDouble(),
+                        category = _uiState.value.category,
+                        date = _uiState.value.date.atTime(now.hour, now.minute, now.second),
+                        recurrence = _uiState.value.recurrence,
+                        note = _uiState.value.note,
+                        smsId = "EXP_${UUID.randomUUID()}",
+                        source = ExpenseSource.MANUAL
                     )
                 )
             }

@@ -43,7 +43,7 @@ fun ExpensesByAll(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = it.toString(),
+                        text = it.formatDay(),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
